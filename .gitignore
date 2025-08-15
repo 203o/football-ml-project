@@ -1,0 +1,45 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# VS Code settings
+.vscode/
+
+# Environment variables & secrets
+*.env
+*.key
+*.token
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs & temp files
+*.log
+*.tmp
+*.swp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Model & data files
+*.pkl
+*.joblib
+*.h5
+*.db
+*.sqlite
+*.csv
+*.xlsx
+
+# API keys or sensitive config files
+config.json
+secrets.json
