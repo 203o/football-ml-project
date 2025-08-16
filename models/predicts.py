@@ -1,17 +1,22 @@
 import streamlit as st
 import pandas as pd
+import os
 import joblib
 from io import BytesIO
 from sklearn.naive_bayes import GaussianNB
 
+
 # === Load model & scaler ===
 @st.cache_resource
 def load_model_and_scaler():
-    nb_model = joblib.load(r"C:\Users\komen\Desktop\Models\nb_model.pkl")
-    scaler = joblib.load(r"C:\Users\komen\Desktop\Models\scaler.pkl")
+    base_path = os.path.dirname(__file__)  # directory of predicts.py
+    nb_model = joblib.load(os.path.join(base_path, "nb_model.pkl"))
+    scaler = joblib.load(os.path.join(base_path, "scaler.pkl"))
     return nb_model, scaler
 
+
 nb_model, scaler = load_model_and_scaler()
+
 
 # === Rule-based prediction function ===
 def predict_result(row):
@@ -26,13 +31,22 @@ def predict_result(row):
 
     if h < avg_h_pct_change_away:
         prediction_flags.append("Away")
-    elif avg_h_pct_change_home > avg_h_pct_change_away and avg_h_pct_change_home > avg_h_pct_change_draw:
+    elif (
+        avg_h_pct_change_home > avg_h_pct_change_away
+        and avg_h_pct_change_home > avg_h_pct_change_draw
+    ):
         prediction_flags.append("Home")
 
     if h > 0 and d > 0 and a > 0:
-        if avg_h_pct_change_home < avg_h_pct_change_away and avg_h_pct_change_draw < avg_h_pct_change_away:
+        if (
+            avg_h_pct_change_home < avg_h_pct_change_away
+            and avg_h_pct_change_draw < avg_h_pct_change_away
+        ):
             prediction_flags.append("Away")
-        elif avg_h_pct_change_home > avg_h_pct_change_away and avg_h_pct_change_draw > avg_h_pct_change_away:
+        elif (
+            avg_h_pct_change_home > avg_h_pct_change_away
+            and avg_h_pct_change_draw > avg_h_pct_change_away
+        ):
             prediction_flags.append("Home")
 
     if not prediction_flags:
@@ -70,7 +84,14 @@ if uploaded_file:
     df["Rule_Away"] = (df["Rule_Prediction"] == "Away").astype(int)
 
     # Prepare features
-    features = ["H%change", "D%change", "A%change", "Rule_Draw", "Rule_Home", "Rule_Away"]
+    features = [
+        "H%change",
+        "D%change",
+        "A%change",
+        "Rule_Draw",
+        "Rule_Home",
+        "Rule_Away",
+    ]
     X_new = df[features]
 
     # Scale features
@@ -87,10 +108,10 @@ if uploaded_file:
     output = BytesIO()
     df.to_excel(output, index=False)
     st.download_button(
-         label="📥 Download Predictions as Excel",
-         data=output.getvalue(),
-         file_name="Predictions.xlsx",
-         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        label="📥 Download Predictions as Excel",
+        data=output.getvalue(),
+        file_name="Predictions.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
     # === Retrain Model Button ===
